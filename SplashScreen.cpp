@@ -11,7 +11,7 @@
 void SplashScreen::Show(sf::RenderWindow& window)
 {
     sf::Texture texture;
-    if (texture.loadFromFile("SplashArt.png") != true)
+    if (texture.loadFromFile("images/SplashArt.png") != true)
     {
         std::cerr << "Issues loading 'SplashArt.png'!" << std::endl;
         return;

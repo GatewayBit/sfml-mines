@@ -12,7 +12,7 @@
 MainMenu::MenuResult MainMenu::Show(sf::RenderWindow& window)
 {
     sf::Texture texture;
-    texture.loadFromFile("MainMenu.png");
+    texture.loadFromFile("images/MainMenu.png");
     
     sf::Sprite sprite(texture);
     
