@@ -1,0 +1,7 @@
+Just a personal project using SFML libraries to create a simple little game.
+
+I am doing this to get a better grasp on utilizing third-party libraries as well as understanding the design process of low level networking.
+
+Most of the development will be done on a Linux based enviornment, but I would like to learn how to cross compile for other operating systems as well.
+
+All in all, it's just a project that will keep me busy, along with improving my overall c++ skills!
