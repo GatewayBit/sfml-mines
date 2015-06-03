@@ -45,11 +45,27 @@ MainMenu::MenuResult MainMenu::Show(sf::RenderWindow& window)
     exitButton.rect.width = 628;
     exitButton.rect.height = 607;
     exitButton.action = Exit;
+
+	MenuItem hostButton;
+	hostButton.rect.top = 278;
+	hostButton.rect.left = 232;
+	hostButton.rect.width = 471;
+	hostButton.rect.height = 400;
+	hostButton.action = Host;
+
+	MenuItem clientButton;
+	clientButton.rect.top = 279;
+	clientButton.rect.left = 557;
+	clientButton.rect.width = 795;
+	clientButton.rect.height = 399;
+	clientButton.action = Client;
     
     _menuItems.push_back(playButton);
     _menuItems.push_back(medButton);
     _menuItems.push_back(hardButton);
     _menuItems.push_back(exitButton);
+	_menuItems.push_back(hostButton);
+	_menuItems.push_back(clientButton);
     
     window.draw(sprite);
     window.display();
@@ -67,7 +83,7 @@ MainMenu::MenuResult MainMenu::GetMenuResponse(sf::RenderWindow& window)
         {
             if (e.type == sf::Event::MouseButtonPressed)
             {
-//                PrintMouseCoord(e.mouseButton.x, e.mouseButton.y);
+                /*PrintMouseCoord(e.mouseButton.x, e.mouseButton.y);*/
                 return HandleClick(e.mouseButton.x, e.mouseButton.y);
             }
             if (e.type == sf::Event::Closed)

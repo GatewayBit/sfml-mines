@@ -27,8 +27,6 @@ public:
 private:
     std::map<int, LandMine*> _mineObjects;
     
-    int test;
-    
     struct MineObjectDeallocator
     {
         void operator() (const std::pair<int, LandMine*>& p) const

@@ -21,7 +21,7 @@ public:
     virtual void LoadRect(sf::Vector2f size, sf::Color c);
     
     virtual void Draw(sf::RenderWindow& window);
-    virtual void Update(float elapsedTime);
+    virtual void Update();
     
     virtual void SetPosition(float x, float y);
     virtual sf::Vector2f GetPosition() const;

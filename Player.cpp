@@ -9,10 +9,11 @@
 #include "Game.h"
 
 Player::Player() : _xVelocity(0.0f), _yVelocity(0.0f),
-        _speed(175), _friction(0.4f), _maxVelocity(200.0f)
+_speed(175), _friction(0.4f), _maxVelocity(200.0f),
+m_isClient(false), _color(255,0,0)
 {
-    VisibleGameObject::LoadRect(sf::Vector2f(12, 12), sf::Color(255, 0, 0));
-    GetRect().setPosition(Game::SCREEN_WIDTH / 2, Game::SCREEN_HEIGHT - 125);
+    VisibleGameObject::LoadRect(sf::Vector2f(12, 12), _color);
+    VisibleGameObject::GetRect().setPosition(Game::SCREEN_WIDTH / 2, Game::SCREEN_HEIGHT - 125);
     VisibleGameObject::SetObjectType("player");
 }
 
@@ -21,9 +22,11 @@ Player::~Player()
     
 }
 
-void Player::Update()
+void Player::Update(int currentPlayer)
 {
     /*
+	 * DONE
+	 *
      * ===***REWORK ME***===
      * Hey, you should like totally rework this
      * mess of player control.
@@ -40,44 +43,68 @@ void Player::Update()
      * 
      * Speed describes only how fast an object is moving, 
      * whereas velocity gives both how fast and in what 
-     * direction the object is moving.
+     * direction the object is moving
      */
+	float x;
+	float y;
+
+	if (!m_isClient)
+	{
+		x = GetRect().getPosition().x;
+		y = GetRect().getPosition().y;
+	}
+	else
+	{
+		x = clientData.xPosition;
+		y = clientData.yPosition;
+	}
     
-    float x = GetRect().getPosition().x;
-    float y = GetRect().getPosition().y;
     
-    //std::cout << "X:" << x << " Y:" << y << '\n';
+    /*std::cout << "[INSIDE PLAYER] X:" << x << " Y:" << y << '\n';*/
     
     float timeDelta = clock.restart().asSeconds();
     
     float velocity = _speed * timeDelta;
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && currentPlayer == 0 ||
+		sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && currentPlayer == 1)
     {
 //        _yVelocity -= _speed;
         y -= velocity;
     }
     
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && currentPlayer == 0 ||
+		sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && currentPlayer == 1)
     {
 //        _yVelocity += _speed;
         y += velocity;
     }
     
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && currentPlayer == 0 ||
+		sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && currentPlayer == 1)
     {
 //        _xVelocity -= _speed;
         x -= velocity;
     }
     
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && currentPlayer == 0 ||
+		sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && currentPlayer == 1)
     {
         x += velocity;
 //        _xVelocity += _speed;
         
     }
     
-    GetRect().setPosition(x, y);
+	if (!m_isClient)
+	{
+		GetRect().setPosition(x, y);
+	}
+	else
+	{
+		clientData.xPosition = x;
+		clientData.yPosition = y;
+		GetRect().setPosition(clientData.xPosition, clientData.yPosition);
+	}
     
     if (x < 0)
     {
@@ -234,4 +261,35 @@ void Player::Respawn()
     
     
     VisibleGameObject::SetPosition(x, y);
+}
+
+void Player::SetIsClient(bool client)
+{
+	m_isClient = client;
+}
+
+Networking::NetPlayer Player::GetClientData()
+{
+	return clientData;
+}
+
+void Player::SetClientData(Networking::NetPlayer c)
+{
+	clientData = c;
+}
+
+void Player::SetColor(int num)
+{
+	sf::Color c;
+
+	if (num == 0)
+	{
+		c.Red;
+	}
+	else if (num == 5)
+	{
+		c.Green;
+	}
+
+	this->GetRect().setFillColor(c.Green);
 }

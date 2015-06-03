@@ -20,7 +20,9 @@ public:
         Exit,
         Easy,
         Medium,
-        Hard
+        Hard,
+		Host,
+		Client
     };
     
     struct MenuItem

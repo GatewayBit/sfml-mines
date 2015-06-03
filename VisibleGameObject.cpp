@@ -48,7 +48,7 @@ void VisibleGameObject::Draw(sf::RenderWindow& window)
         window.draw(_rect);
 }
 
-void VisibleGameObject::Update(float elapsedTime)
+void VisibleGameObject::Update()
 {
     // Do nothing here since we will allow the inherited
     // object use this if they want.
@@ -66,9 +66,11 @@ void VisibleGameObject::SetPosition(float x, float y)
 sf::Vector2f VisibleGameObject::GetPosition() const
 {
     if(_isLoaded)
-    {
         return _sprite.getPosition();
-    }
+
+	if (!_isLoaded && _isRectangle)
+		return _rect.getPosition();
+
     return sf::Vector2f();
 }
 
