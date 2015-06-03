@@ -11,6 +11,8 @@ NetworkHost::~NetworkHost()
 
 // Testing Again!
 
+// Testing Twice!!
+
 bool NetworkHost::Hosting()
 {
 	std::cout << "[SERVER] Init Server" << '\n';
