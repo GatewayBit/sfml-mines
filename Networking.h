@@ -13,13 +13,12 @@ public:
 
 	struct NetPlayer
 	{
+		float dataHeader;
+
 		float id;
 		std::string name;
 		std::string color;
 		float ping;
-
-		bool isReady;
-		bool isWinner;
 		
 		float xPosition;
 		float yPosition;
@@ -27,12 +26,12 @@ public:
 
 	friend sf::Packet& operator <<(sf::Packet& packet, const Networking::NetPlayer& player)
 	{
-		return packet << player.id << player.name << player.color << player.ping << player.isReady << player.isWinner << player.xPosition << player.yPosition;
+		return packet << player.dataHeader << player.id << player.name << player.color << player.ping << player.xPosition << player.yPosition;
 	}
 
 	friend sf::Packet& operator >>(sf::Packet& packet, Networking::NetPlayer& player)
 	{
-		return packet >> player.id >> player.name >> player.color >> player.ping >> player.isReady >> player.isWinner >> player.xPosition >> player.yPosition;
+		return packet >> player.dataHeader >> player.id >> player.name >> player.color >> player.ping >> player.xPosition >> player.yPosition;
 	}
 };
 

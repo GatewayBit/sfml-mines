@@ -200,84 +200,35 @@ void Game::GameLoop()
 		case Game::ClientPlayer:
 		{
 			NetworkClient m_client;
-			PlayerManager m_PlayerManager;
-			m_client.SetPlayerManager(m_PlayerManager);
 
 			std::cout << "[CLIENT] Init Client." << '\n';
-			
-			m_client.player.id = 0;
-			m_client.player.name = "Prototype Tester Client 0";
-			m_client.player.ping = 0;
-			m_client.player.color = "Green";
-			m_client.player.isReady = true;
-			m_client.player.isWinner = false;
-			m_client.player.xPosition = 512;
-			m_client.player.yPosition = 384;
+			m_client.InitWithHost();
 
-			m_client.SetPlayerData(m_client.player);
+			sf::Event e;
+			e.type = sf::Event::GainedFocus;
 
-			
-			sf::Thread clientSendData(&NetworkClient::SendPacketData, &m_client);
-			sf::Thread clientGetData(&NetworkClient::GetPacketData, &m_client);
-			
-
-			
-			if (m_client.ConnectToHost(m_client.player))
+			while (e.type != sf::Event::Closed)
 			{
-				std::cout << "[CLIENT] We are connected to Host!" << '\n';
+				_mainWindow.pollEvent(e);
+				_mainWindow.clear(sf::Color(0, 0, 0));
 
-				Player* p = new Player();
-				p->SetColor(5);
-				p->SetIsClient(true);
-				p->SetClientData(m_client.player);
-				m_PlayerManager.Add(0, p);
-				m_client.SetPlayerManager(m_PlayerManager);
 
-				sf::Event e;
-				e.type = sf::Event::GainedFocus;
+				// Updates here
+					
 
-				clientSendData.launch();
-				clientGetData.launch();
+				_mainWindow.display();
 
-				while (e.type != sf::Event::Closed)
+				if (e.type == sf::Event::KeyPressed)
 				{
-					if (m_client.IsNewClient())
+					if (e.key.code == sf::Keyboard::Escape)
 					{
-						Player* player = new Player();
-						player->SetIsClient(true);
-						player->SetClientData(m_client.GetPlayerPacketData());
-						m_PlayerManager.Add(m_client.GetPlayerPacketData().id, player);
-						m_client.SetPlayerManager(m_PlayerManager);
-						m_client.SetIsNewClient(false);
+						_gameState = Game::Exiting;
+						e.type = sf::Event::Closed;
 					}
-
-					m_client.SetPlayerData(p->GetClientData());
-
-					_mainWindow.pollEvent(e);
-					_mainWindow.clear(sf::Color(0, 0, 0));
-
-					m_PlayerManager.UpdateAll();
-					m_PlayerManager.DrawAll(_mainWindow);
-					_mainWindow.display();
-
-					if (e.type == sf::Event::KeyPressed)
-					{
-						if (e.key.code == sf::Keyboard::Escape)
-						{
-							_gameState = Game::Exiting;
-							e.type = sf::Event::Closed;
-						}
-					}
-
-					//m_client.DisplayPacketTraffic();
 				}
-			}
-			else
-			{
-				std::cout << "[CLIENT] Connection to Host failed." << '\n';
-				_gameState = Game::Exiting;
-			}
 
+				//m_client.DisplayPacketTraffic();
+			}
 			_gameState = Game::Exiting;
 			break;
 		}

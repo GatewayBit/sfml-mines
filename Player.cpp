@@ -290,6 +290,4 @@ void Player::SetColor(int num)
 	{
 		c.Green;
 	}
-
-	this->GetRect().setFillColor(c.Green);
 }
