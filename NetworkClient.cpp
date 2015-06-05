@@ -16,7 +16,8 @@ void NetworkClient::InitWithHost()
 
 	m_clientSocket.bind(8888);
 	// THIS WILL ONLY LET CUJO DESKTOP HOST
-	m_remoteIP = m_remoteIP.getPublicAddress();
+	//m_remoteIP = m_remoteIP.getPublicAddress();
+	m_remoteIP = "64.246.108.134";
 
 	sf::Packet p;
 
@@ -57,7 +58,10 @@ Networking::NetPlayer NetworkClient::ReceivePacketData()
 {
 	sf::Packet p;
 	Networking::NetPlayer data;
-	m_clientSocket.receive(p, m_remoteIP, m_remotePort);
+	
+	sf::IpAddress remoteIP;
+	unsigned short remotePort;
+	m_clientSocket.receive(p, remoteIP, remotePort);
 
 	p >> data;
 	return data;

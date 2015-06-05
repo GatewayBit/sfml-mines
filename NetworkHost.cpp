@@ -131,6 +131,8 @@ bool NetworkHost::Hosting()
 							clientData.xPosition += 3;
 						}
 
+
+						// For each client, send packet data about game to them **IN PROGRESS**
 						p.clear();
 						p << clientData;
 						serverSocket.send(p, remoteIP, remotePort);

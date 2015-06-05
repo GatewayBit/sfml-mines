@@ -241,7 +241,6 @@ void Game::GameLoop()
 				// **Read packets from server
 				localPlayer = m_client.ReceivePacketData();
 
-				std::cout << "[CLIENT] DATA HEADER: " << localPlayer.dataHeader << '\n';
 				std::cout << "[CLIENT] ID: " << localPlayer.id << '\n';
 				std::cout << "[CLIENT] NAME: " << localPlayer.name << '\n';
 				std::cout << "[CLIENT] X: " << localPlayer.xPosition << '\n';
