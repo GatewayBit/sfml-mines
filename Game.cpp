@@ -19,7 +19,7 @@ void Game::Start()
         return;
     
     _mainWindow.create(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 32), "Mines Prototype - ZiphTech");
-	_mainWindow.setFramerateLimit(120);
+	_mainWindow.setFramerateLimit(60);
 
     // More init code here.
     
@@ -204,6 +204,8 @@ void Game::GameLoop()
 			Networking::NetPlayer localPlayer;
 			Player* player = new Player();
 
+			sf::Clock c;
+
 			std::cout << "[CLIENT] Init Client." << '\n';
 			m_client.InitWithHost();
 
@@ -235,25 +237,48 @@ void Game::GameLoop()
 				// Set the player data equal to localPlayer data
 				localPlayer = player->GetClientData();
 				// Send
-				m_client.SendPacketData(localPlayer);
+				if (localPlayer.move != "")
+				{
+					sf::Time t = c.getElapsedTime();
+					if (t.asMilliseconds() > sf::milliseconds(20).asMilliseconds())
+					{
+						m_client.SendPacketData(localPlayer);
+						c.restart();
+					}
+				}
 
 				
 				// **Read packets from server
-				localPlayer = m_client.ReceivePacketData();
+				Networking::NetPlayer receivedPlayerData;
+				// THIS METHOD CAN RETURN DROPPED PACKET DATA
+				receivedPlayerData = m_client.ReceivePacketData();
 
-				std::cout << "[CLIENT] ID: " << localPlayer.id << '\n';
-				std::cout << "[CLIENT] NAME: " << localPlayer.name << '\n';
-				std::cout << "[CLIENT] X: " << localPlayer.xPosition << '\n';
-				std::cout << "[CLIENT] Y: " << localPlayer.yPosition << '\n';
+				//std::cout << "[CLIENT] ID: " << receivedPlayerData.id << '\n';
+				//std::cout << "[CLIENT] NAME: " << receivedPlayerData.name << '\n';
+				//std::cout << "[CLIENT] X: " << receivedPlayerData.xPosition << '\n';
+				//std::cout << "[CLIENT] Y: " << receivedPlayerData.yPosition << '\n';
 
 
 				// **Use packets to draw player positions
-				playerManager.UpdatePlayerData(localPlayer.id, localPlayer);
+				// IF PACKET IS NOT LOST; UPDATE PLAYER DATA.
+				if (receivedPlayerData.dataHeader != -1)
+				{
+					localPlayer = receivedPlayerData;
+					playerManager.UpdatePlayerData(localPlayer.id, localPlayer);
+				}
+				else
+				{
+					// THIS MAY NOT BE NEEDED
+					localPlayer.dataHeader = 0;
+				}
+				
 
 				// Render / Draw
 				playerManager.DrawAll(_mainWindow);
 
 				_mainWindow.display();
+
+				m_client.DisplayPacketTraffic();
 
 				if (e.type == sf::Event::KeyPressed)
 				{

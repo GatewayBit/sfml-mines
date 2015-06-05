@@ -54,3 +54,13 @@ int NetworkPlayerManager::GetCount() const
 {
 	return m_clientData.size();
 }
+
+void NetworkPlayerManager::UpdatePlayerData(float position, Networking::NetPlayer data)
+{
+	std::map<float, Networking::NetPlayer>::iterator itr = m_clientData.find(position);
+	while (itr != m_clientData.end())
+	{
+		itr->second = data;
+		itr++;
+	}
+}

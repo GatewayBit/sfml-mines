@@ -15,6 +15,8 @@ public:
 
 	std::map<float, Networking::NetPlayer>& GetMapObject();
 
+	void UpdatePlayerData(float position, Networking::NetPlayer data);
+
 private:
 
 	std::map<float, Networking::NetPlayer> m_clientData;

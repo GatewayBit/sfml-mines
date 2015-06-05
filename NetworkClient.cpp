@@ -1,7 +1,7 @@
 #include "NetworkClient.h"
 
 NetworkClient::NetworkClient() : m_packetSent(0), m_packetReceived(0), m_remotePort(5555)
-{
+{ 
 }
 
 
@@ -45,6 +45,9 @@ void NetworkClient::InitWithHost()
 
 		SetLocalPlayerPacketData(m_playerData);
 	}
+
+	m_clientSocket.setBlocking(false);
+
 }
 
 void NetworkClient::SendPacketData(Networking::NetPlayer data)
@@ -52,6 +55,7 @@ void NetworkClient::SendPacketData(Networking::NetPlayer data)
 	sf::Packet p;
 	p << data;
 	m_clientSocket.send(p, m_remoteIP, m_remotePort);
+	m_packetSent++;
 }
 
 Networking::NetPlayer NetworkClient::ReceivePacketData()
@@ -61,10 +65,16 @@ Networking::NetPlayer NetworkClient::ReceivePacketData()
 	
 	sf::IpAddress remoteIP;
 	unsigned short remotePort;
-	m_clientSocket.receive(p, remoteIP, remotePort);
-
-	p >> data;
+	if (m_clientSocket.receive(p, remoteIP, remotePort) == sf::Socket::Done)
+	{
+		m_packetReceived++;
+		p >> data;
+		return data;
+	}
+	// PACKET LOST OR NO DATA TO RECEIVE
+	data.dataHeader = -1;
 	return data;
+	
 }
 
 

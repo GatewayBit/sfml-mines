@@ -45,6 +45,15 @@ bool NetworkHost::Hosting()
 			// Simulate/update game		**DONE**
 			// For each client, send packet data about game to them **IN PROGRESS**
 
+
+
+			// Issues
+			// When running code locally, I can run the server/client just fine
+			// If I run a server local and a client remote I run into both
+			// wanting to receive data.
+
+			// I think the best way to solve this is to set socket blocking to false
+
 			// Test the socket for data
 			if (selector.isReady(serverSocket))
 			{
@@ -73,10 +82,13 @@ bool NetworkHost::Hosting()
 					if (clientData.dataHeader == 0)
 					{
 						// Client is idle; 
-						clientData.dataHeader = 0;
-						p.clear();
-						p << clientData;
-						serverSocket.send(p, remoteIP, remotePort);
+						// DO NOTHING
+
+						//clientData = clientDataManager.GetData(clientData.id);
+
+						//p.clear();
+						//p << clientData;
+						//serverSocket.send(p, remoteIP, remotePort);
 					}
 
 					// INIT DATA
@@ -112,33 +124,34 @@ bool NetworkHost::Hosting()
 						// Set dataHeader to 0 to reset our data header.
 						clientData.dataHeader = 0;
 
+						float speed = 5;
+
 						std::cout << clientData.name << " wants to move " << clientData.move << " direction." << '\n';
 
 						if (clientData.move == "W")
 						{
-							clientData.yPosition -= 3;
+							clientData.yPosition -= speed;
 						}
 						else if (clientData.move == "A")
 						{
-							clientData.xPosition -= 3;
+							clientData.xPosition -= speed;
 						}
 						else if (clientData.move == "S")
 						{
-							clientData.yPosition += 3;
+							clientData.yPosition += speed;
 						}
 						else if (clientData.move == "D")
 						{
-							clientData.xPosition += 3;
+							clientData.xPosition += speed;
 						}
 
+						/*clientDataManager.UpdatePlayerData(clientData.id, clientData);*/
 
 						// For each client, send packet data about game to them **IN PROGRESS**
 						p.clear();
 						p << clientData;
 						serverSocket.send(p, remoteIP, remotePort);
 					}
-
-
 				}
 			}
 		}
