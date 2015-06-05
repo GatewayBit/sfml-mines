@@ -64,7 +64,7 @@ void PlayerManager::UpdateAll()
 	
 	while (itr != _vgoObjects.end())
 	{
-		itr->second->Update(itr->first);
+		itr->second->Update();
 		itr++;
 	}
 }
@@ -82,4 +82,14 @@ bool PlayerManager::CollisionCheck(VisibleGameObject* other)
 		itr++;
 	}
 	return false;
+}
+
+void PlayerManager::UpdatePlayerData(int position, Networking::NetPlayer data)
+{
+	std::map<int, Player*>::const_iterator itr = _vgoObjects.find(position);
+	while (itr != _vgoObjects.end())
+	{
+		itr->second->SetClientData(data);
+		itr++;
+	}
 }

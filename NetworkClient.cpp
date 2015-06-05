@@ -1,6 +1,6 @@
 #include "NetworkClient.h"
 
-NetworkClient::NetworkClient() : m_packetSent(0), m_packetReceived(0)
+NetworkClient::NetworkClient() : m_packetSent(0), m_packetReceived(0), m_remotePort(5555)
 {
 }
 
@@ -15,13 +15,16 @@ void NetworkClient::InitWithHost()
 	std::cout << "[CLIENT] Running Client Init Code." << '\n';
 
 	m_clientSocket.bind(8888);
-	m_clientIP = m_clientIP.getPublicAddress();
+	// THIS WILL ONLY LET CUJO DESKTOP HOST
+	m_remoteIP = m_remoteIP.getPublicAddress();
 
 	sf::Packet p;
+
+	// SEND INIT HEADER CODE
 	m_playerData.dataHeader = 1.0;
 
 	p << m_playerData;
-	m_clientSocket.send(p, m_clientIP, 5555);
+	m_clientSocket.send(p, m_remoteIP, m_remotePort);
 	p.clear();
 
 	sf::IpAddress remoteIP;
@@ -38,38 +41,26 @@ void NetworkClient::InitWithHost()
 		std::cout << "[CLIENT] COLOR: " << m_playerData.color << '\n';
 		std::cout << "[CLIENT] X: " << m_playerData.xPosition << '\n';
 		std::cout << "[CLIENT] Y: " << m_playerData.yPosition << '\n';
+
+		SetLocalPlayerPacketData(m_playerData);
 	}
 }
 
-void NetworkClient::SendPacketData()
+void NetworkClient::SendPacketData(Networking::NetPlayer data)
 {
-	Networking::NetPlayer clientData;
-
-	sf::Packet data;
-	data << clientData;
-	//if (clientSocket.send(data) == sf::Socket::Done)
-	//{
-	//	m_packetSent++;
-	//}
-	//else if (clientSocket.send(data) == sf::Socket::Disconnected)
-	//{
-	//	std::cout << "[CLIENT] NO CONNECTION TO HOST" << '\n';
-	//	// THIS WILL DETECT IF THE CLIENT IS NOT CONNECTED TO THE HOST
-	//	// BUT IT WILL NEED ADDITIONAL WORK TO MAKE THIS FUNCTION PROPERLY
-	//}
+	sf::Packet p;
+	p << data;
+	m_clientSocket.send(p, m_remoteIP, m_remotePort);
 }
 
-void NetworkClient::GetPacketData()
+Networking::NetPlayer NetworkClient::ReceivePacketData()
 {
-	Networking::NetPlayer p;
+	sf::Packet p;
+	Networking::NetPlayer data;
+	m_clientSocket.receive(p, m_remoteIP, m_remotePort);
 
-	sf::Packet data;
-
-	//if (clientSocket.receive(data) == sf::Socket::Done)
-	//{
-	//	m_packetReceived++;
-	//	data >> p;
-	//}
+	p >> data;
+	return data;
 }
 
 
@@ -78,10 +69,21 @@ void NetworkClient::SetPlayerPacketData(Networking::NetPlayer& data)
 	m_playerData = data;
 }
 
-Networking::NetPlayer NetworkClient::GetPlayerPacketData()
+Networking::NetPlayer NetworkClient::GetPlayerPacketData() const
 {
 	return m_playerData;
 }
+
+void NetworkClient::SetLocalPlayerPacketData(Networking::NetPlayer& data)
+{
+	m_localPlayerData = data;
+}
+
+Networking::NetPlayer NetworkClient::GetLocalPlayerPacketData() const
+{
+	return m_localPlayerData;
+}
+
 
 void NetworkClient::DisplayPacketTraffic()
 {

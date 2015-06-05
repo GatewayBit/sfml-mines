@@ -200,9 +200,17 @@ void Game::GameLoop()
 		case Game::ClientPlayer:
 		{
 			NetworkClient m_client;
+			PlayerManager playerManager;
+			Networking::NetPlayer localPlayer;
+			Player* player = new Player();
 
 			std::cout << "[CLIENT] Init Client." << '\n';
 			m_client.InitWithHost();
+
+			localPlayer = m_client.GetLocalPlayerPacketData();
+			player->SetIsClient(true);
+			player->SetClientData(localPlayer);
+			playerManager.Add(localPlayer.id, player);
 
 			sf::Event e;
 			e.type = sf::Event::GainedFocus;
@@ -211,10 +219,40 @@ void Game::GameLoop()
 			{
 				_mainWindow.pollEvent(e);
 				_mainWindow.clear(sf::Color(0, 0, 0));
+				
+				// Get user input						**DONE**
+				// Send input in packet to server		**DONE**
+				// Read packets from server				**DONE**
+				// Use packets to draw player positions	**DONE**
+				// Render/Draw							**DONE**
+
+				// **Get user input.
+				playerManager.UpdateAll();
+				
+				// **Send input in packet to server
+				// Get the player object from the manager
+				player = playerManager.GetPlayerObject(localPlayer.id);
+				// Set the player data equal to localPlayer data
+				localPlayer = player->GetClientData();
+				// Send
+				m_client.SendPacketData(localPlayer);
+
+				
+				// **Read packets from server
+				localPlayer = m_client.ReceivePacketData();
+
+				std::cout << "[CLIENT] DATA HEADER: " << localPlayer.dataHeader << '\n';
+				std::cout << "[CLIENT] ID: " << localPlayer.id << '\n';
+				std::cout << "[CLIENT] NAME: " << localPlayer.name << '\n';
+				std::cout << "[CLIENT] X: " << localPlayer.xPosition << '\n';
+				std::cout << "[CLIENT] Y: " << localPlayer.yPosition << '\n';
 
 
-				// Updates here
-					
+				// **Use packets to draw player positions
+				playerManager.UpdatePlayerData(localPlayer.id, localPlayer);
+
+				// Render / Draw
+				playerManager.DrawAll(_mainWindow);
 
 				_mainWindow.display();
 

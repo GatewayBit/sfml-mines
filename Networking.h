@@ -19,6 +19,8 @@ public:
 		std::string name;
 		std::string color;
 		float ping;
+
+		std::string move;
 		
 		float xPosition;
 		float yPosition;
@@ -26,12 +28,12 @@ public:
 
 	friend sf::Packet& operator <<(sf::Packet& packet, const Networking::NetPlayer& player)
 	{
-		return packet << player.dataHeader << player.id << player.name << player.color << player.ping << player.xPosition << player.yPosition;
+		return packet << player.dataHeader << player.id << player.name << player.color << player.ping << player.move << player.xPosition << player.yPosition;
 	}
 
 	friend sf::Packet& operator >>(sf::Packet& packet, Networking::NetPlayer& player)
 	{
-		return packet >> player.dataHeader >> player.id >> player.name >> player.color >> player.ping >> player.xPosition >> player.yPosition;
+		return packet >> player.dataHeader >> player.id >> player.name >> player.color >> player.ping >> player.move >> player.xPosition >> player.yPosition;
 	}
 };
 

@@ -14,6 +14,7 @@ public:
 	void Remove(int position);
 	int GetCount() const;
 	Player* GetPlayerObject(int position) const;
+	void UpdatePlayerData(int position, Networking::NetPlayer data);
 
 	void DrawAll(sf::RenderWindow& window);
 	void UpdateAll();

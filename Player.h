@@ -20,7 +20,7 @@ public:
     Player();
     ~Player();
 
-    void Update(int currentPlayer);
+    void Update();
     void Draw(sf::RenderWindow& window);
     
     bool CollisionCheck(VisibleGameObject* other);
@@ -28,7 +28,7 @@ public:
 	void SetIsClient(bool client);
 
 	Networking::NetPlayer GetClientData();
-	void SetClientData(Networking::NetPlayer c);
+	void SetClientData(Networking::NetPlayer& c);
 
     void Respawn();
 

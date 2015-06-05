@@ -10,19 +10,24 @@ public:
 
 	void InitWithHost();
 
-	void SendPacketData();
-	void GetPacketData();
+	void SendPacketData(Networking::NetPlayer data);
+	Networking::NetPlayer ReceivePacketData();
 
 	void SetPlayerPacketData(Networking::NetPlayer& data);
-	Networking::NetPlayer GetPlayerPacketData();
+	Networking::NetPlayer GetPlayerPacketData() const;
+
+	void SetLocalPlayerPacketData(Networking::NetPlayer& data);
+	Networking::NetPlayer GetLocalPlayerPacketData() const;
 
 	void DisplayPacketTraffic();
 
 private:
 	sf::UdpSocket m_clientSocket;
-	sf::IpAddress m_clientIP;
+	sf::IpAddress m_remoteIP;
+	unsigned short m_remotePort;
 
 	Networking::NetPlayer m_playerData;
+	Networking::NetPlayer m_localPlayerData;
 
 	int m_packetSent;
 	int m_packetReceived;

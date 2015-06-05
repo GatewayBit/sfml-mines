@@ -20,9 +20,6 @@ bool NetworkHost::Hosting()
 	{
 		std::cout << "[SERVER] SOCKET BOUND TO PORT 5555" << '\n';
 	}
-	// Create a list to store the future clients
-	std::list<sf::UdpSocket*> clients;
-
 	// Create a map to store client data.
 	NetworkPlayerManager clientDataManager;
 
@@ -43,29 +40,44 @@ bool NetworkHost::Hosting()
 		// Make the selector wait for data on any socket
 		if (selector.wait())
 		{
-			// Test the listener
+			// Read client input		**DONE**
+			// Execute client input		**DONE**
+			// Simulate/update game		**DONE**
+			// For each client, send packet data about game to them **IN PROGRESS**
+
+			// Test the socket for data
 			if (selector.isReady(serverSocket))
 			{
 				std::cout << "[SERVER] I GOT A PACKET FROM SOMEONE." << '\n';
 
-				sf::Packet p;
-
 				/*
-				THIS IS CRUCIAL DATA FAGGOT DO NOT DELETE
+				THIS IS CRUCIAL DATA DO NOT DELETE
 				*/
+				sf::Packet p;
 				sf::IpAddress remoteIP;
 				unsigned short remotePort;
-				/*
-				THIS IS CRUCIAL DATA FAGGOT DO NOT DELETE
-				*/
 				Networking::NetPlayer clientData;
+				/*
+				THIS IS CRUCIAL DATA DO NOT DELETE
+				*/
 
+				// Read the data from the socket.
 				if (serverSocket.receive(p, remoteIP, remotePort) == sf::Socket::Done)
 				{
 					p >> clientData;
 					std::cout << "DATA HEADER: " << clientData.dataHeader << '\n';
 					std::cout << "IP: " << remoteIP.toString() << '\n';
 					std::cout << "PORT: " << remotePort << '\n';
+
+					// IDLE DATA
+					if (clientData.dataHeader == 0)
+					{
+						// Client is idle; 
+						clientData.dataHeader = 0;
+						p.clear();
+						p << clientData;
+						serverSocket.send(p, remoteIP, remotePort);
+					}
 
 					// INIT DATA
 					if (clientData.dataHeader == 1.0)
@@ -90,7 +102,41 @@ bool NetworkHost::Hosting()
 						p.clear();
 						p << clientData;
 						serverSocket.send(p, remoteIP, remotePort);
+
+						clientDataManager.Add(clientData.id, clientData);
 					}
+
+					// MOVE DATA
+					if (clientData.dataHeader == 2.0)
+					{
+						// Set dataHeader to 0 to reset our data header.
+						clientData.dataHeader = 0;
+
+						std::cout << clientData.name << " wants to move " << clientData.move << " direction." << '\n';
+
+						if (clientData.move == "W")
+						{
+							clientData.yPosition -= 3;
+						}
+						else if (clientData.move == "A")
+						{
+							clientData.xPosition -= 3;
+						}
+						else if (clientData.move == "S")
+						{
+							clientData.yPosition += 3;
+						}
+						else if (clientData.move == "D")
+						{
+							clientData.xPosition += 3;
+						}
+
+						p.clear();
+						p << clientData;
+						serverSocket.send(p, remoteIP, remotePort);
+					}
+
+
 				}
 			}
 		}

@@ -22,89 +22,81 @@ Player::~Player()
     
 }
 
-void Player::Update(int currentPlayer)
+void Player::Update()
 {
-    /*
-	 * DONE
-	 *
-     * ===***REWORK ME***===
-     * Hey, you should like totally rework this
-     * mess of player control.
-     * 
-     * The issue is, when you push a button of movement
-     * your velocity is changed by that amount and STAYS there
-     * 
-     * What I want it to do is when I push a button
-     * move in that DIRECTION and move toward it.
-     * 
-     * I need to have players current position
-     * and move it towards a direction by the
-     * velocity not using velocity as direction.
-     * 
-     * Speed describes only how fast an object is moving, 
-     * whereas velocity gives both how fast and in what 
-     * direction the object is moving
-     */
+	Networking::NetPlayer netPlayer = GetClientData();
+
 	float x;
 	float y;
 
-	if (!m_isClient)
-	{
-		x = GetRect().getPosition().x;
-		y = GetRect().getPosition().y;
-	}
-	else
-	{
-		x = clientData.xPosition;
-		y = clientData.yPosition;
-	}
-    
-    
-    /*std::cout << "[INSIDE PLAYER] X:" << x << " Y:" << y << '\n';*/
+	x = GetRect().getPosition().x;
+	y = GetRect().getPosition().y;
+	
     
     float timeDelta = clock.restart().asSeconds();
     
     float velocity = _speed * timeDelta;
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && currentPlayer == 0 ||
-		sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && currentPlayer == 1)
+	netPlayer.dataHeader = 0;
+	netPlayer.move = "";
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
     {
-//        _yVelocity -= _speed;
-        y -= velocity;
+		if (m_isClient)
+		{
+			netPlayer.dataHeader = 2.0;
+			netPlayer.move = "W";
+		}
+		else
+		{
+			y -= velocity;
+		}
     }
     
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && currentPlayer == 0 ||
-		sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && currentPlayer == 1)
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
     {
-//        _yVelocity += _speed;
-        y += velocity;
+		if (m_isClient)
+		{
+			netPlayer.dataHeader = 2.0;
+			netPlayer.move = "S";
+		}
+		else
+		{
+			y += velocity;
+		}
     }
     
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && currentPlayer == 0 ||
-		sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && currentPlayer == 1)
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
     {
-//        _xVelocity -= _speed;
-        x -= velocity;
+		if (m_isClient)
+		{
+			netPlayer.dataHeader = 2.0;
+			netPlayer.move = "A";
+		}
+		else
+		{
+			x -= velocity;
+		}
     }
     
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && currentPlayer == 0 ||
-		sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && currentPlayer == 1)
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
     {
-        x += velocity;
-//        _xVelocity += _speed;
-        
+		if (m_isClient)
+		{
+			netPlayer.dataHeader = 2.0;
+			netPlayer.move = "D";
+		}
+		else
+		{
+			x += velocity;
+		}
     }
-    
-	if (!m_isClient)
+	if (m_isClient)
 	{
-		GetRect().setPosition(x, y);
+		SetClientData(netPlayer);
 	}
-	else
-	{
-		clientData.xPosition = x;
-		clientData.yPosition = y;
-		GetRect().setPosition(clientData.xPosition, clientData.yPosition);
-	}
+
+	GetRect().setPosition(x, y);
     
     if (x < 0)
     {
@@ -122,74 +114,15 @@ void Player::Update(int currentPlayer)
     {
         GetRect().setPosition(x, Game::SCREEN_HEIGHT - GetRect().getSize().y);
     }
-    
-    
-    
-    /*
-     * This block is used to calculate friction applied
-     * to the player until coming to a full stop.
-     */
-//    float xTemp = _xVelocity;
-//    float yTemp = _yVelocity;
-//
-//    if (xTemp > 0)
-//        _xVelocity -= _friction;
-//    if (xTemp < 0)
-//        _xVelocity += _friction;
-//
-//    if (yTemp > 0)
-//        _yVelocity -= _friction;
-//    if (yTemp < 0)
-//        _yVelocity += _friction;
-    /*
-     * These are both in place to prevent the player
-     * from bouncing back and forth due to the result
-     * in friction reduction.
-     */
-//    if (_xVelocity < 0.1 && _xVelocity > -0.1)
-//    {
-//        _xVelocity = 0;
-//    }
-//    if (_yVelocity < 0.1 && _yVelocity > -0.1)
-//    {
-//        _yVelocity = 0;
-//    }
-    
-    /*
-     * This block is to make sure we don't exceed
-     * our max velocity limit set.
-     */
-//    if (_xVelocity > _maxVelocity)
-//        _xVelocity = _maxVelocity;
-//    
-//    if (_xVelocity < -_maxVelocity)
-//        _xVelocity = -_maxVelocity;
-//    
-//    if (_yVelocity > _maxVelocity)
-//        _yVelocity = _maxVelocity;
-//    
-//    if (_yVelocity < -_maxVelocity)
-//        _yVelocity = -_maxVelocity;
-    
-    
-//    if (xTemp > 0)
-//        x -= _xVelocity;
-//    if (xTemp < 0)
-//        x += _xVelocity;
-//
-//    if (yTemp > 0)
-//        y -= _yVelocity;
-//    if (yTemp < 0)
-//        y += _yVelocity;
-
-    
-    
-//    GetRect().move(_xVelocity * timeDelta, _yVelocity * timeDelta);
-    
 }
 
 void Player::Draw(sf::RenderWindow& window)
 {
+	if (m_isClient)
+	{
+		Networking::NetPlayer netPlayer = GetClientData();
+		GetRect().setPosition(netPlayer.xPosition, netPlayer.yPosition);
+	}
     VisibleGameObject::Draw(window);
 }
 
@@ -273,7 +206,7 @@ Networking::NetPlayer Player::GetClientData()
 	return clientData;
 }
 
-void Player::SetClientData(Networking::NetPlayer c)
+void Player::SetClientData(Networking::NetPlayer& c)
 {
 	clientData = c;
 }
@@ -281,7 +214,6 @@ void Player::SetClientData(Networking::NetPlayer c)
 void Player::SetColor(int num)
 {
 	sf::Color c;
-
 	if (num == 0)
 	{
 		c.Red;
@@ -290,4 +222,5 @@ void Player::SetColor(int num)
 	{
 		c.Green;
 	}
+	VisibleGameObject::GetRect().setFillColor(c);
 }
