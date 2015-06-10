@@ -19,9 +19,15 @@ public:
 	void SetLocalPlayerPacketData(Networking::NetPlayer& data);
 	Networking::NetPlayer GetLocalPlayerPacketData() const;
 
+	void SetRemoteIP(std::string ip);
+
 	void DisplayPacketTraffic();
 
 private:
+
+	sf::Clock m_clock;
+	sf::Time m_endTime;
+
 	sf::UdpSocket m_clientSocket;
 	sf::IpAddress m_remoteIP;
 	unsigned short m_remotePort;

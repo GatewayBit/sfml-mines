@@ -17,7 +17,6 @@ void NetworkClient::InitWithHost()
 	m_clientSocket.bind(8888);
 	// THIS WILL ONLY LET CUJO DESKTOP HOST
 	//m_remoteIP = m_remoteIP.getPublicAddress();
-	m_remoteIP = "64.246.108.134";
 
 	sf::Packet p;
 
@@ -52,8 +51,11 @@ void NetworkClient::InitWithHost()
 
 void NetworkClient::SendPacketData(Networking::NetPlayer data)
 {
+	m_clock.restart();
+	
 	sf::Packet p;
 	p << data;
+
 	m_clientSocket.send(p, m_remoteIP, m_remotePort);
 	m_packetSent++;
 }
@@ -69,6 +71,10 @@ Networking::NetPlayer NetworkClient::ReceivePacketData()
 	{
 		m_packetReceived++;
 		p >> data;
+
+		m_endTime = m_clock.getElapsedTime();
+		std::cout << "PING: " << m_endTime.asMilliseconds() << '\n';
+		
 		return data;
 	}
 	// PACKET LOST OR NO DATA TO RECEIVE
@@ -103,4 +109,17 @@ void NetworkClient::DisplayPacketTraffic()
 {
 	std::cout << '\n' << "Packet Sent: " << m_packetSent << '\n';
 	std::cout << "Packet Received: " << m_packetReceived << '\n' << '\n';
+}
+
+void NetworkClient::SetRemoteIP(std::string ip)
+{
+	if (ip == "")
+	{
+		m_remoteIP = "64.246.108.134";
+	}
+	else
+	{
+		m_remoteIP = ip;
+	}
+	
 }

@@ -30,8 +30,7 @@ void Player::Update()
 	float y;
 
 	x = GetRect().getPosition().x;
-	y = GetRect().getPosition().y;
-	
+	y = GetRect().getPosition().y;	
     
     float timeDelta = clock.restart().asSeconds();
     
@@ -40,12 +39,38 @@ void Player::Update()
 	netPlayer.dataHeader = 0;
 	netPlayer.move = "";
 
+	// the client adds a sequence number to each request
+	// when the server replies, it includes the sequence number of the last input it processed
+
+	// the server says “based on what I’ve seen up to your request #1, your position is x = 11”.
+	// Now let’s assume the client keeps a copy of the requests it sends to the server. 
+	// Based on the new game state, it knows the server has already processed request #1, so it can discard that copy.
+	// But it also knows the server still has to send back the result of processing request #2.
+	
+	// So applying client-side prediction again, the client can calculate the “present” state of the game based on the 
+	// last authoritative state sent by the server, plus the inputs the server hasn’t processed yet.
+
+	// the client gets “x = 11, last processed request = #1”. It discards its copies of sent input up to #1
+	// but it retains a copy of #2, which hasn’t been acknowledged by the server.
+
+	// It updates it internal game state with what the server sent, x = 11, and then applies all the input
+	// still not seen by the server – in this case, input #2, “move to the right”
+
+	// The end result is x = 12, which is correct.
+
+	// a new game state arrives from the server; this time it says “x = 12, last processed request = #2”.
+	// At this point, the client discards all input up to #2, and updates the state with x = 12.
+	// There’s no unprocessed input to replay, so processing ends there, with the correct result.
+
+
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
     {
 		if (m_isClient)
 		{
 			netPlayer.dataHeader = 2.0;
 			netPlayer.move = "W";
+
+			// each user command (and the exact time it was generated) is stored on the client. The prediction algorithm uses these stored commands.
 		}
 		else
 		{

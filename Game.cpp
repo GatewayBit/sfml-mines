@@ -34,16 +34,11 @@ void Game::Start()
     _gameState = Game::ShowSplash;
     
 
-	/*sf::Clock c;*/
+	
     // Our entire game loop enters here.
     while (!IsExiting())
     {
-		/*sf::Time t = c.getElapsedTime();*/
         GameLoop();
-		/*sf::Time t2 = c.getElapsedTime();
-
-		float fps = sf::seconds(1).asSeconds() / (t2.asSeconds() - t.asSeconds());
-		std::cout << "FPS: " << fps << '\n';*/
     }
     
     _mainWindow.close();
@@ -207,6 +202,14 @@ void Game::GameLoop()
 			sf::Clock c;
 
 			std::cout << "[CLIENT] Init Client." << '\n';
+			std::cout << "[CLIENT] Enter IP in the following format: 192.168.1.1" << '\n';
+			std::cout << "**PRO TIP** Leave blank if Cujo is hosting; Just hit [ENTER] pleb." << '\n';
+			std::cout << "ENTER IP: ";
+			std::string ipInput;
+			std::getline(std::cin, ipInput);
+
+			m_client.SetRemoteIP(ipInput);
+
 			m_client.InitWithHost();
 
 			localPlayer = m_client.GetLocalPlayerPacketData();
@@ -217,8 +220,13 @@ void Game::GameLoop()
 			sf::Event e;
 			e.type = sf::Event::GainedFocus;
 
+			/*sf::Clock fpsClock;*/
+
 			while (e.type != sf::Event::Closed)
 			{
+				/*sf::Time fpsTime = fpsClock.getElapsedTime();*/
+
+
 				_mainWindow.pollEvent(e);
 				_mainWindow.clear(sf::Color(0, 0, 0));
 				
@@ -240,7 +248,7 @@ void Game::GameLoop()
 				if (localPlayer.move != "")
 				{
 					sf::Time t = c.getElapsedTime();
-					if (t.asMilliseconds() > sf::milliseconds(20).asMilliseconds())
+					if (t.asMilliseconds() > sf::milliseconds(50).asMilliseconds())
 					{
 						m_client.SendPacketData(localPlayer);
 						c.restart();
@@ -253,11 +261,6 @@ void Game::GameLoop()
 				// THIS METHOD CAN RETURN DROPPED PACKET DATA
 				receivedPlayerData = m_client.ReceivePacketData();
 
-				//std::cout << "[CLIENT] ID: " << receivedPlayerData.id << '\n';
-				//std::cout << "[CLIENT] NAME: " << receivedPlayerData.name << '\n';
-				//std::cout << "[CLIENT] X: " << receivedPlayerData.xPosition << '\n';
-				//std::cout << "[CLIENT] Y: " << receivedPlayerData.yPosition << '\n';
-
 
 				// **Use packets to draw player positions
 				// IF PACKET IS NOT LOST; UPDATE PLAYER DATA.
@@ -268,6 +271,7 @@ void Game::GameLoop()
 				}
 				else
 				{
+					// NO PACKET RECEIVED
 					// THIS MAY NOT BE NEEDED
 					localPlayer.dataHeader = 0;
 				}
@@ -278,8 +282,6 @@ void Game::GameLoop()
 
 				_mainWindow.display();
 
-				m_client.DisplayPacketTraffic();
-
 				if (e.type == sf::Event::KeyPressed)
 				{
 					if (e.key.code == sf::Keyboard::Escape)
@@ -288,6 +290,12 @@ void Game::GameLoop()
 						e.type = sf::Event::Closed;
 					}
 				}
+
+
+				//sf::Time fpsTime2 = fpsClock.getElapsedTime();
+
+				//float fps = sf::seconds(1).asSeconds() / (fpsTime2.asSeconds() - fpsTime.asSeconds());
+				//std::cout << "FPS: " << fps << '\n';
 
 				//m_client.DisplayPacketTraffic();
 			}
@@ -374,7 +382,6 @@ void Game::InitPlayers(int count)
 		y = SCREEN_HEIGHT - 20;
 	}
 }
-
 
 Game::GameState Game::_gameState = Uninitialized;
 sf::RenderWindow Game::_mainWindow;
